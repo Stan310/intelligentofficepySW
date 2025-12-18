@@ -167,4 +167,22 @@ class TestIntelligentOffice(unittest.TestCase):
         mock_led.assert_called_once_with(office.LED_PIN, GPIO.LOW)
         self.assertFalse(office.light_on)
 
+    @patch.object(IntelligentOffice, "check_quadrant_occupancy")
+    @patch.object(GPIO, "output")
+    def test_occupied_but_light_off(self, mock_led: Mock, mock_check_quadrant_occupancy: Mock):
+        mock_check_quadrant_occupancy.side_effect = [True, False, False, False]
+        office = IntelligentOffice()
+        office.light_on = False
+        office.manage_light_level()
+        mock_led.assert_called_once_with(office.LED_PIN, GPIO.HIGH)
+        self.assertTrue(office.light_on)
+
+    @patch.object(GPIO, "output")
+    @patch.object(GPIO, "input")
+    def test_gas_detected(self, mock_gas_sensor: Mock, mock_buzzer: Mock):
+        mock_gas_sensor.return_value = False
+        office = IntelligentOffice()
+        office.monitor_air_quality()
+        mock_buzzer.assert_called_once_with(36, True)
+        self.assertTrue(office.buzzer_on)
 
