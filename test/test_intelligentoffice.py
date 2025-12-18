@@ -72,3 +72,43 @@ class TestIntelligentOffice(unittest.TestCase):
         office = IntelligentOffice()
         outcome = office.check_quadrant_occupancy(office.INFRARED_PIN5)
         self.assertTrue(outcome)
+
+    @patch.object(IntelligentOffice, "change_servo_angle")
+    @patch.object(SDL_DS3231, "read_datetime")
+    def test_open_blinds_at_8_on_weekday(self, mock_rtc: Mock, mock_servo: Mock):
+        mock_rtc.return_value = datetime(2025, 12, 18, 8, 0,0)
+        office = IntelligentOffice()
+        office.blinds_open = False
+        office.manage_blinds_based_on_time()
+        mock_servo.assert_called_once_with(12)
+        self.assertTrue(office.blinds_open)
+
+    @patch.object(IntelligentOffice, "change_servo_angle")
+    @patch.object(SDL_DS3231, "read_datetime")
+    def test_close_blinds_at_20_on_weekday(self, mock_rtc: Mock, mock_servo: Mock):
+        mock_rtc.return_value = datetime(2025, 12, 18, 20, 0,0)
+        office = IntelligentOffice()
+        office.blinds_open = True
+        office.manage_blinds_based_on_time()
+        mock_servo.assert_called_once_with(2)
+        self.assertFalse(office.blinds_open)
+
+    @patch.object(IntelligentOffice, "change_servo_angle")
+    @patch.object(SDL_DS3231, "read_datetime")
+    def test_blinds_closed_after_20_on_weekday(self, mock_rtc: Mock, mock_servo: Mock):
+        mock_rtc.return_value = datetime(2025, 12, 18, 21, 0,0)
+        office = IntelligentOffice()
+        office.blinds_open = False
+        office.manage_blinds_based_on_time()
+        mock_servo.assert_not_called()
+        self.assertFalse(office.blinds_open)
+
+    @patch.object(IntelligentOffice, "change_servo_angle")
+    @patch.object(SDL_DS3231, "read_datetime")
+    def test_weekend_blinds_remain_closed(self, mock_rtc: Mock, mock_servo: Mock):
+        mock_rtc.return_value = datetime(2025, 12, 20, 9, 0,0)
+        office = IntelligentOffice()
+        office.blinds_open = False
+        office.manage_blinds_based_on_time()
+        mock_servo.assert_not_called()
+        self.assertFalse(office.blinds_open)
