@@ -112,3 +112,59 @@ class TestIntelligentOffice(unittest.TestCase):
         office.manage_blinds_based_on_time()
         mock_servo.assert_not_called()
         self.assertFalse(office.blinds_open)
+
+    @patch.object(VEML7700, "lux", new_callable=PropertyMock)
+    @patch.object(GPIO, "output")
+    def test_light_level_lower_than_500(self, mock_led: Mock, mock_lux: Mock):
+        mock_lux.return_value = 499
+        office = IntelligentOffice()
+        office.light_on = False
+        office.manage_light_level()
+        mock_led.assert_called_once_with(office.LED_PIN, True)
+        outcome = office.light_on
+        self.assertTrue(outcome)
+
+    @patch.object(VEML7700, "lux", new_callable=PropertyMock)
+    @patch.object(GPIO, "output")
+    def test_light_level_higher_than_550(self, mock_led: Mock, mock_lux: Mock):
+        mock_lux.return_value = 551
+        office = IntelligentOffice()
+        office.light_on = True
+        office.manage_light_level()
+        mock_led.assert_called_once_with(office.LED_PIN, False)
+        outcome = office.light_on
+        self.assertFalse(outcome)
+
+    @patch.object(VEML7700, "lux", new_callable=PropertyMock)
+    @patch.object(GPIO, "output")
+    def test_light_level_higher_than_550_light_already_off(self, mock_led: Mock, mock_lux: Mock):
+        mock_lux.return_value = 551
+        office = IntelligentOffice()
+        office.light_on = False
+        office.manage_light_level()
+        mock_led.assert_not_called()
+        outcome = office.light_on
+        self.assertFalse(outcome)
+
+    @patch.object(VEML7700, "lux", new_callable=PropertyMock)
+    @patch.object(GPIO, "output")
+    def test_light_level_lower_than_500_light_already_on(self, mock_led: Mock, mock_lux: Mock):
+        mock_lux.return_value = 499
+        office = IntelligentOffice()
+        office.light_on = True
+        office.manage_light_level()
+        mock_led.assert_not_called()
+        outcome = office.light_on
+        self.assertTrue(outcome)
+
+    @patch.object(IntelligentOffice, "check_quadrant_occupancy")
+    @patch.object(GPIO, "output")
+    def test_not_occupied_but_light_on(self, mock_led: Mock, mock_check_quadrant_occupancy: Mock):
+        mock_check_quadrant_occupancy.side_effect = [False, False, False, False]
+        office = IntelligentOffice()
+        office.light_on = True
+        office.manage_light_level()
+        mock_led.assert_called_once_with(office.LED_PIN, GPIO.LOW)
+        self.assertFalse(office.light_on)
+
+
