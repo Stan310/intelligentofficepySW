@@ -186,3 +186,11 @@ class TestIntelligentOffice(unittest.TestCase):
         mock_buzzer.assert_called_once_with(36, True)
         self.assertTrue(office.buzzer_on)
 
+    @patch.object(GPIO, "output")
+    @patch.object(GPIO, "input")
+    def test_gas_not_detected(self, mock_gas_sensor: Mock, mock_buzzer: Mock):
+        mock_gas_sensor.return_value = True
+        office = IntelligentOffice()
+        office.monitor_air_quality()
+        mock_buzzer.assert_called_once_with(36, False)
+        self.assertFalse(office.buzzer_on)
