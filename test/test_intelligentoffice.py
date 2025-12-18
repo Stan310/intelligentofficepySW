@@ -13,12 +13,13 @@ class TestIntelligentOffice(unittest.TestCase):
     def test_occupancy_quadrant_1_yes(self, infrared_sensor1: Mock):
         infrared_sensor1.return_value = True
         office = IntelligentOffice()
-        outcome = office.check_quadrant_occupancy()
+        outcome = office.check_quadrant_occupancy(office.INFRARED_PIN1)
         self.assertTrue(outcome)
 
     @patch.object(GPIO, "input")
     def test_occupancy_quadrant_1_no(self, infrared_sensor1: Mock):
         infrared_sensor1.return_value = False
         office = IntelligentOffice()
-        outcome = office.check_quadrant_occupancy()
+        outcome = office.check_quadrant_occupancy(office.INFRARED_PIN1)
         self.assertFalse(outcome)
+
