@@ -54,8 +54,10 @@ class IntelligentOffice:
         self.buzzer_on = False
 
     def check_quadrant_occupancy(self, pin: int) -> bool:
-        # Check occupancy for the given quadrant
-        return GPIO.input(pin)
+        if pin not in [11, 12, 13, 15]:
+            raise IntelligentOfficeError
+        else:
+            return GPIO.input(pin)
 
     def manage_blinds_based_on_time(self) -> None:
         # To be implemented

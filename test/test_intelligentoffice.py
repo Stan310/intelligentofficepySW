@@ -23,3 +23,52 @@ class TestIntelligentOffice(unittest.TestCase):
         outcome = office.check_quadrant_occupancy(office.INFRARED_PIN1)
         self.assertFalse(outcome)
 
+    @patch.object(GPIO, "input")
+    def test_occupancy_quadrant_2_yes(self, infrared_sensor2: Mock):
+        infrared_sensor2.return_value = True
+        office = IntelligentOffice()
+        outcome = office.check_quadrant_occupancy(office.INFRARED_PIN2)
+        self.assertTrue(outcome)
+
+    @patch.object(GPIO, "input")
+    def test_occupancy_quadrant_2_no(self, infrared_sensor2: Mock):
+        infrared_sensor2.return_value = False
+        office = IntelligentOffice()
+        outcome = office.check_quadrant_occupancy(office.INFRARED_PIN2)
+        self.assertFalse(outcome)
+
+
+    @patch.object(GPIO, "input")
+    def test_occupancy_quadrant_3_yes(self, infrared_sensor3: Mock):
+        infrared_sensor3.return_value = True
+        office = IntelligentOffice()
+        outcome = office.check_quadrant_occupancy(office.INFRARED_PIN3)
+        self.assertTrue(outcome)
+
+    @patch.object(GPIO, "input")
+    def test_occupancy_quadrant_3_no(self, infrared_sensor3: Mock):
+        infrared_sensor3.return_value = False
+        office = IntelligentOffice()
+        outcome = office.check_quadrant_occupancy(office.INFRARED_PIN3)
+        self.assertFalse(outcome)
+
+    @patch.object(GPIO, "input")
+    def test_occupancy_quadrant_4_yes(self, infrared_sensor4: Mock):
+        infrared_sensor4.return_value = True
+        office = IntelligentOffice()
+        outcome = office.check_quadrant_occupancy(office.INFRARED_PIN4)
+        self.assertTrue(outcome)
+
+    @patch.object(GPIO, "input")
+    def test_occupancy_quadrant_4_no(self, infrared_sensor4: Mock):
+        infrared_sensor4.return_value = False
+        office = IntelligentOffice()
+        outcome = office.check_quadrant_occupancy(office.INFRARED_PIN4)
+        self.assertFalse(outcome)
+
+    @patch.object(GPIO, "input")
+    def test_false_test_occupancy_quadrant_5_nonexistent_should_fail(self, infrared_sensor5: Mock):
+        infrared_sensor5.return_value = True
+        office = IntelligentOffice()
+        outcome = office.check_quadrant_occupancy(office.INFRARED_PIN5)
+        self.assertTrue(outcome)
